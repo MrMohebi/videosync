@@ -1,0 +1,39 @@
+{
+  "author": "Rafael Ketsetsides",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{aa9130d9-a04c-445b-9df7-7746bd06d3be}"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["<all_urls>"],
+      "match_about_blank": false,
+      "all_frames": false
+    }
+  ],
+  "browser_action": {
+    "browser_style": true,
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "img/3d-glasses_inactive_16.png",
+      "32": "img/3d-glasses_inactive_32.png",
+      "64": "img/3d-glasses_inactive_64.png"
+    }
+  },
+  "description": "VideoSync is a browser extension that makes watching videos together easier.",
+  "manifest_version": 2,
+  "name": "VideoSync",
+  "options_ui": {
+    "page": "options.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "version": "0.0.1"
+}
