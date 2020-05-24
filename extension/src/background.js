@@ -63,22 +63,24 @@ browser.runtime.onMessage.addListener(
             const server = request.join_room.server;
             ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + room.path); ws.onopen = () => resolve(ws);});
             ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
+            ws_prom.then(ws => ws.onclose = () => {
+                console.log("Leaving room", room);
+                room = {};
+                browser.browserAction.setBadgeText({text: ""});
+                browser.browserAction.setIcon({
+                    path: {
+                        16: "img/3d-glasses_inactive_16.png",
+                        32: "img/3d-glasses_inactive_32.png",
+                        64: "img/3d-glasses_inactive_64.png"
+                    }
+                });
+            });
             console.log("Joined room", room.path);
         }
         if (request.leave_room) {
             if (room.path) {
                 ws_prom.then(ws => ws.close());
             }
-            console.log("Leaving room", room);
-            room = {};
-            browser.browserAction.setBadgeText({text: ""});
-            browser.browserAction.setIcon({
-                path: {
-                    16: "img/3d-glasses_inactive_16.png",
-                    32: "img/3d-glasses_inactive_32.png",
-                    64: "img/3d-glasses_inactive_64.png"
-                }
-            });
         }
         if (request.share_url) {
             if (room.path) {
