@@ -95,7 +95,7 @@ selectElement(video => {
             if (mess.video_info && mess.source != "local") {
                 const username = mess.username || "Anonymous";
                 if (mess.video_info.duration != null && mess.video_info.duration != video.duration) {
-                    displayNotification("VideoSync Warning", "Video durations do not match");
+                    displayNotification("VideoSync Warning", "Video duration does not match with " + username);
                 }
                 if (mess.video_info.paused != null && mess.video_info.paused != video.paused) {
                     if (video.paused) {
