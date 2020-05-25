@@ -28,7 +28,8 @@
   },
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "notifications"
   ],
   "version": "0.0.1"
 }

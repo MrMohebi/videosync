@@ -93,34 +93,35 @@ selectElement(video => {
         var port = browser.runtime.connect({name: "video_selector"});
         port.onMessage.addListener(mess => {
             if (mess.video_info && mess.source != "local") {
+                const username = mess.username || "Anonymous";
                 if (mess.video_info.duration != null && mess.video_info.duration != video.duration) {
                     displayNotification("VideoSync Warning", "Video durations do not match");
                 }
                 if (mess.video_info.paused != null && mess.video_info.paused != video.paused) {
                     if (video.paused) {
                         console.log("Playing video");
-                        displayNotification("VideoSync", "Resuming");
+                        displayNotification("VideoSync", username + " resumed");
                         video.removeEventListener("play", updateVideo);
                         video.play();
                         video.addEventListener("play", updateVideo);
                     }
                     else {
                         console.log("Pausing video");
-                        displayNotification("VideoSync", "Pausing");
+                        displayNotification("VideoSync", username + " paused");
                         video.removeEventListener("pause", updateVideo);
                         video.pause();
                         video.addEventListener("pause", updateVideo);
                     }
                 }
                 if (mess.video_info.playbackRate != null && mess.video_info.playbackRate != video.playbackRate) {
-                    displayNotification("VideoSync", "Set playback speed to " + mess.video_info.playbackRate);
+                    displayNotification("VideoSync", username + " set playback speed to " + mess.video_info.playbackRate);
                     video.removeEventListener("ratechange", updateVideo);
                     video.playbackRate = mess.video_info.playbackRate;
                     video.addEventListener("ratechange", updateVideo);
                 }
                 const latency = mess.video_info.paused?0:mess.latency*video.playbackRate;
                 if (mess.video_info.currentTime != null && Math.abs(mess.video_info.currentTime + latency - video.currentTime) > 0.5*video.playbackRate + latency) {
-                    displayNotification("VideoSync", "Seeking");
+                    displayNotification("VideoSync", username + " seeking");
                     console.log("Seeking to", mess.video_info.currentTime);
                     video.currentTime = mess.video_info.currentTime + latency;
                 }
