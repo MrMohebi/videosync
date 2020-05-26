@@ -7,6 +7,7 @@ const select_video_button = document.getElementById("select_video"),
 select_video_button.addEventListener("click",
     () => browser.tabs.query({active: true, currentWindow: true})
         .then(tabs => tabs[0].id)
+        .then(tabid => {browser.tabs.executeScript(tabid, {allFrames: true, matchAboutBlank: true, file: "browser-polyfill.min.js"}); return tabid;})
         .then(tabid => browser.tabs.executeScript(tabid, {allFrames: true, matchAboutBlank: true, file: "select_video.js"}))
         .then(() => window.close())
 );

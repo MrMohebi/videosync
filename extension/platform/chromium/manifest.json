@@ -7,8 +7,8 @@
     {
       "js": ["browser-polyfill.min.js", "content.js"],
       "matches": ["<all_urls>"],
-      "match_about_blank": true,
-      "all_frames": true
+      "match_about_blank": false,
+      "all_frames": false
     }
   ],
   "browser_action": {

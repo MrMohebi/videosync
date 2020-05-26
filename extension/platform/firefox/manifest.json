@@ -6,11 +6,11 @@
     }
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["browser-polyfill.min.js", "background.js"]
   },
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": ["browser-polyfill.min.js", "content.js"],
       "matches": ["<all_urls>"],
       "match_about_blank": false,
       "all_frames": false
