@@ -34,7 +34,7 @@ browser.storage.local.get("server").then(res => {
 
 function displayNotification(title, message) {
     if (browser.notifications) {
-        return browser.notifications.create({
+        return browser.notifications.create("videosync", {
             type: "basic",
             iconUrl: browser.runtime.getURL("img/3d-glasses_active_64.png"),
             title: title,
