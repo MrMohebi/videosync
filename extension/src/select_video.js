@@ -92,7 +92,7 @@ function displayNotification(title, message) {
 
 selectElement(video => {
     if (!video) {
-        alert("You must select a video");
+        displayNotification("VideoSync Warning", "You must select a video");
     }
     else {
         var port = browser.runtime.connect({name: "video_selector"});
