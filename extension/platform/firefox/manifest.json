@@ -34,7 +34,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "notifications"
+    "notifications",
+    "<all_urls>"
   ],
   "version": "0.0.1"
 }

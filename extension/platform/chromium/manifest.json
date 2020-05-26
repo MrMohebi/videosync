@@ -7,8 +7,8 @@
     {
       "js": ["browser-polyfill.min.js", "content.js"],
       "matches": ["<all_urls>"],
-      "match_about_blank": false,
-      "all_frames": false
+      "match_about_blank": true,
+      "all_frames": true
     }
   ],
   "browser_action": {
@@ -29,7 +29,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "notifications"
+    "notifications",
+    "<all_urls>"
   ],
   "version": "0.0.1"
 }

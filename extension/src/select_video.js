@@ -35,8 +35,13 @@ function selectElement(callback, predicate="true()") {
             overlay_dom.appendChild(highlight);
         }
         overlay_dom.style.setProperty("pointer-events", "none", "important");
-        var cur = document.elementFromPoint(ev.clientX, ev.clientY);
+        var els = document.elementsFromPoint(ev.clientX, ev.clientY);
         overlay_dom.style.setProperty("pointer-events", "auto", "important");
+        var cur = els[0];
+        var matching = els.filter(el => document.evaluate(predicate, el, null, XPathResult.BOOLEAN_TYPE, null).booleanValue);
+        if (matching.length) {
+            cur = matching[0];
+        }
         if (cur != lastElement) {
             levels = 0;
             drawRect(highlight_path, cur);
