@@ -8,7 +8,7 @@ function drawRect(path, el) {
 
 function selectElement(callback, predicate="true()") {
     const overlay_dom = document.createElement("metasearch-overlay");
-    overlay_dom.style = "background: transparent none repeat scroll 0% 0% !important; border: 0px none !important; border-radius: 0px !important; box-shadow: none !important; display: block !important; height: 100% !important; left: 0px !important; margin: 0px !important; max-height: none !important; max-width: none !important; opacity: 1 !important; outline: currentcolor none 0px !important; padding: 0px !important; position: fixed !important; top: 0px !important; visibility: visible !important; width: 100% !important; z-index: 0;";
+    overlay_dom.style = "background: transparent none repeat scroll 0% 0% !important; border: 0px none !important; border-radius: 0px !important; box-shadow: none !important; display: block !important; height: 100% !important; left: 0px !important; margin: 0px !important; max-height: none !important; max-width: none !important; opacity: 1 !important; outline: currentcolor none 0px !important; padding: 0px !important; position: fixed !important; top: 0px !important; visibility: visible !important; width: 100% !important; z-index: 2147483638;";
     document.documentElement.appendChild(overlay_dom);
     var lastElement = undefined;
     var highlight = document.createElementNS("http://www.w3.org/2000/svg", "svg");
