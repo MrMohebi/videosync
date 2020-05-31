@@ -7,7 +7,7 @@ function drawRect(path, el) {
 }
 
 function selectElement(callback, predicate="true()") {
-    const overlay_dom = document.createElement("metasearch-overlay");
+    const overlay_dom = document.createElement("videosync-select-overlay");
     overlay_dom.style = "background: transparent none repeat scroll 0% 0% !important; border: 0px none !important; border-radius: 0px !important; box-shadow: none !important; display: block !important; height: 100% !important; left: 0px !important; margin: 0px !important; max-height: none !important; max-width: none !important; opacity: 1 !important; outline: currentcolor none 0px !important; padding: 0px !important; position: fixed !important; top: 0px !important; visibility: visible !important; width: 100% !important; z-index: 2147483638;";
     document.documentElement.appendChild(overlay_dom);
     var lastElement = undefined;
@@ -90,11 +90,19 @@ function displayNotification(title, message) {
     return browser.runtime.sendMessage({notification: {title: title, message: message}});
 }
 
+function createVideoOverlay(video) {
+    var overlay = document.createElement("videosync-video-overlay");
+    video.parentElement.appendChild(overlay);
+    overlay.style = "position: absolute; z-index: 300000; float: left; margin-left: 5%; margin-top: 5%; padding: 0.5rem; font-size: 1.5rem; color: #fff; background: rgba(0, 0, 0, 0.75); display: none;";
+    return overlay;
+}
+
 selectElement(video => {
     if (!video) {
         displayNotification("VideoSync Warning", "You must select a video");
     }
     else {
+        var overlay = createVideoOverlay(video);
         var port = browser.runtime.connect({name: "video_selector"});
         port.onMessage.addListener(mess => {
             if (mess.video_info && mess.source != "local") {
@@ -130,6 +138,12 @@ selectElement(video => {
                     console.log("Seeking to", mess.video_info.currentTime);
                     video.currentTime = mess.video_info.currentTime + latency;
                 }
+            }
+            else if (mess.notification) {
+                clearTimeout(overlay.timeout);
+                overlay.style.display = "block";
+                overlay.innerText = mess.notification.title + ": " + mess.notification.message;
+                overlay.timeout = setTimeout(() => overlay.style.display = "none", 5000);
             }
         });
         const updateVideo = () => port.postMessage({video_info: {duration: video.duration, paused: video.paused, currentTime: video.currentTime, playbackRate: video.playbackRate}, source: "local"});

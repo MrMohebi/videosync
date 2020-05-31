@@ -33,7 +33,10 @@ browser.storage.local.get("server").then(res => {
 });
 
 function displayNotification(title, message) {
-    if (browser.notifications) {
+    if (room.port) {
+        room.port.postMessage({notification: {title: title, message: message}});
+    }
+    else if (browser.notifications) {
         return browser.notifications.create("videosync", {
             type: "basic",
             iconUrl: browser.runtime.getURL("img/3d-glasses_active_64.png"),
@@ -58,33 +61,45 @@ browser.runtime.onMessage.addListener(
             });
         }
         if (request.join_room && !room.path) {
-            browser.browserAction.setIcon({
-                path: {
-                    16: "img/3d-glasses_active_16.png",
-                    32: "img/3d-glasses_active_32.png",
-                    64: "img/3d-glasses_active_64.png"
-                }
-            });
-            room.path = request.join_room.room;
             const server = request.join_room.server;
-            ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + room.path); ws.onopen = () => resolve(ws);});
-            ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
-            ws_prom.then(ws => ws.onclose = () => {
-                if (room.path) {
-                    room = {};
-                    browser.browserAction.setBadgeText({text: ""});
+            const connect = (path) => {
+                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + room.path); ws.onopen = () => resolve(ws);});
+                ws_prom.then(() => {
                     browser.browserAction.setIcon({
                         path: {
-                            16: "img/3d-glasses_inactive_16.png",
-                            32: "img/3d-glasses_inactive_32.png",
-                            64: "img/3d-glasses_inactive_64.png"
+                            16: "img/3d-glasses_active_16.png",
+                            32: "img/3d-glasses_active_32.png",
+                            64: "img/3d-glasses_active_64.png"
                         }
                     });
+                    room.path = path;
+                });
+                ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
+            };
+            connect(request.join_room.room);
+            ws_prom.then(ws => ws.onclose = () => {
+                browser.browserAction.setBadgeText({text: ""});
+                browser.browserAction.setIcon({
+                    path: {
+                        16: "img/3d-glasses_inactive_16.png",
+                        32: "img/3d-glasses_inactive_32.png",
+                        64: "img/3d-glasses_inactive_64.png"
+                    }
+                });
+                const path = room.path;
+                room.path = null;
+                if (path) {
+                    displayNotification("VideoSync Warning", "Disconnected");
+                    if (room.port) {
+                        room.port.postMessage({video_info: {paused: true}, username: "VideoSync"});
+                    }
+                    connect(path);
                 }
             });
         }
         if (request.leave_room) {
             if (room.path) {
+                room.path = null;
                 ws_prom.then(ws => ws.close());
             }
         }
