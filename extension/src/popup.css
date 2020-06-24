@@ -1,0 +1,22 @@
+html, body {
+  background: transparent;
+  box-sizing: border-box;
+  color: #222426;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  font: caption;
+  margin: 0px;
+  padding: 1px;
+}
+
+body * {
+  box-sizing: border-box;
+  text-align: start;
+  font: caption;
+  margin: 0px;
+}
+
+input {
+  margin-bottom: 1px;
+}
