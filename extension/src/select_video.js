@@ -19,7 +19,6 @@
     }
 
     function handleMess(mess) {
-        console.log("Handle message video selector");
         if (mess.source == "local") {
             return;
         }
@@ -47,14 +46,12 @@
             }
             if (mess.video_info.paused != null && mess.video_info.paused != video.paused) {
                 if (video.paused) {
-                    console.log("Playing video");
                     displayNotification("VideoSync", username + " resumed");
                     video.removeEventListener("play", updateVideo);
                     video.play();
                     video.addEventListener("play", updateVideo);
                 }
                 else {
-                    console.log("Pausing video");
                     displayNotification("VideoSync", username + " paused");
                     video.removeEventListener("pause", updateVideo);
                     video.pause();
@@ -70,7 +67,6 @@
             const latency = mess.video_info.paused?0:mess.latency*video.playbackRate;
             if (mess.video_info.currentTime != null && Math.abs(mess.video_info.currentTime + latency - video.currentTime) > 0.5*video.playbackRate + latency) {
                 displayNotification("VideoSync", username + " seeking");
-                console.log("Seeking to", mess.video_info.currentTime);
                 video.currentTime = mess.video_info.currentTime + latency;
             }
         }
@@ -83,7 +79,6 @@
     port.onMessage.addListener(handleMess);
     port.postMessage({videos: videos.length, source: "local"});
     port.onDisconnect.addListener(() => {
-        console.log("video selector port disconnect");
         if (notification_overlay) {
             notification_overlay.parentNode.removeChild(notification_overlay);
         }

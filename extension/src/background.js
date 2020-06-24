@@ -14,7 +14,6 @@ browser.runtime.onStartup.addListener(() => {
 });
 
 function onMessage(mess) {
-    console.log("Got message", mess);
     if (!room.mess_log) {
         room.mess_log = [];
     }
@@ -36,7 +35,6 @@ function onMessage(mess) {
         }
     }
     if (mess.ok) {
-        console.log("Stop waiting");
         room.waiting = false;
     }
     if (mess.peer_message && mess.peer_message.url) {
@@ -67,7 +65,6 @@ function displayNotification(title, message) {
 
 browser.runtime.onMessage.addListener(
     function(request) {
-        console.log("REQUEST", request);
         if (request.get_file) {
             return fetch(request.get_file).then(response => response.text());
         }
@@ -75,7 +72,6 @@ browser.runtime.onMessage.addListener(
             return new Promise(resolve => {
                 var ret_room = {};
                 request.get_room.properties.forEach(prop => ret_room[prop] = room[prop]);
-                console.log("Returning", ret_room);
                 resolve(ret_room);
             });
         }
@@ -144,19 +140,16 @@ browser.runtime.onMessage.addListener(
 var ports = [];
 
 browser.runtime.onConnect.addListener(port => {
-    console.log("Port connected: " + port.name);
     if (!room.tabId || room.tabId != port.sender.tab.id) {
         ports.forEach(p => p.disconnect());
         ports = [];
         room.tabId = port.sender.tab.id;
     }
     ports.push(port);
-    console.log("pushed");
 
     const listenInfo = mess => {
         if (mess.video_info && mess.source == "local") {
             room.waiting = true;
-            console.log("Waiting for message...");
             browser.storage.local.get("username")
                 .then(res => res.username)
                 .then(username => ws_prom

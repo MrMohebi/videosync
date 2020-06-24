@@ -36,7 +36,6 @@ username_input.addEventListener("input",
 
 browser.runtime.sendMessage({get_room: {properties: ["path"]}})
     .then(room => {
-        console.log("Got room:", room);
         if (room == null || room.path == null) {
             share_page_button.disabled = leave_room_button.disabled = select_video_button.disabled = true;
             share_page_button.style.display = leave_room_button.style.display = select_video_button.style.display = "none";
