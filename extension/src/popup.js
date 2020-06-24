@@ -3,7 +3,7 @@ const select_video_button = document.getElementById("select_video"),
     create_room_button = document.getElementById("create_room"),
     share_page_button = document.getElementById("share_page"),
     username_input = document.getElementById("username"),
-    room_name_div = document.getElementById("room_name");
+    room_name_span = document.getElementById("room_name");
 
 leave_room_button.addEventListener("click",
     () => browser.runtime.sendMessage({leave_room: true})
@@ -39,10 +39,10 @@ browser.runtime.sendMessage({get_room: {properties: ["path"]}})
         if (room == null || room.path == null) {
             share_page_button.disabled = leave_room_button.disabled = select_video_button.disabled = true;
             share_page_button.style.display = leave_room_button.style.display = select_video_button.style.display = "none";
-            room_name_div.innerText = "(none)";
+            room_name_span.innerText = "(none)";
         }
         else {
-            room_name_div.innerText = room.path;
+            room_name_span.innerText = room.path;
         }
     });
 

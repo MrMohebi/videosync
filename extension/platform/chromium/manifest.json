@@ -12,7 +12,6 @@
     }
   ],
   "browser_action": {
-    "browser_style": true,
     "default_popup": "popup.html",
     "default_icon": {
       "16": "img/3d-glasses_inactive_16.png",
