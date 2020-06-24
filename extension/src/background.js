@@ -1,6 +1,18 @@
 var room = {},
     ws_prom;
 
+browser.runtime.onStartup.addListener(() => {
+    browser.browserAction.setBadgeText({text: ""});
+    browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
+    browser.browserAction.setIcon({
+        path: {
+            16: "img/3d-glasses_inactive_16.png",
+            32: "img/3d-glasses_inactive_32.png",
+            64: "img/3d-glasses_inactive_64.png"
+        }
+    });
+});
+
 function onMessage(mess) {
     console.log("Got message", mess);
     if (!room.mess_log) {
@@ -9,7 +21,14 @@ function onMessage(mess) {
     room.mess_log.push(mess);
     if (mess.roomCnt) {
         room.count = mess.roomCnt;
-        browser.browserAction.setBadgeText({text: room.count.toString()});
+        if (room.port) {
+            browser.browserAction.setBadgeText({text: room.count.toString()});
+            browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
+        }
+        else {
+            browser.browserAction.setBadgeText({text: "!"});
+            browser.browserAction.setBadgeBackgroundColor({color: "#d83131"});
+        }
     }
     if (mess.peer_message && mess.peer_message.video_info) {
         if (room.port && !room.waiting) {
@@ -77,8 +96,9 @@ browser.runtime.onMessage.addListener(
                 ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
             };
             connect(request.join_room.room);
-            ws_prom.then(ws => ws.onclose = () => {
+            ws_prom.then(ws => ws.onclose = ws.onerror = () => {
                 browser.browserAction.setBadgeText({text: ""});
+                browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
                 browser.browserAction.setIcon({
                     path: {
                         16: "img/3d-glasses_inactive_16.png",
@@ -89,10 +109,7 @@ browser.runtime.onMessage.addListener(
                 const path = room.path;
                 room.path = null;
                 if (path) {
-                    displayNotification("VideoSync Warning", "Disconnected");
-                    if (room.port) {
-                        room.port.postMessage({video_info: {paused: true}, username: "VideoSync"});
-                    }
+                    displayNotification("VideoSync Warning", "Disconnected, trying to reconnect");
                     connect(path);
                 }
             });
@@ -115,12 +132,28 @@ browser.runtime.onMessage.addListener(
         if (request.notification) {
             displayNotification(request.notification.title, request.notification.message);
         }
+        if (request.select_video) {
+            ports.forEach(p => p.disconnect());
+            ports = [];
+            browser.tabs.executeScript(request.select_video.tabid, {allFrames: true, matchAboutBlank: true, file: "browser-polyfill.min.js"})
+                .then(() => browser.tabs.executeScript(request.select_video.tabid, {allFrames: true, matchAboutBlank: true, file: "select_video.js"}));
+        }
     }
 );
 
+var ports = [];
+
 browser.runtime.onConnect.addListener(port => {
-    room.port = port;
-    port.onMessage.addListener(mess => {
+    console.log("Port connected: " + port.name);
+    if (!room.tabId || room.tabId != port.sender.tab.id) {
+        ports.forEach(p => p.disconnect());
+        ports = [];
+        room.tabId = port.sender.tab.id;
+    }
+    ports.push(port);
+    console.log("pushed");
+
+    const listenInfo = mess => {
         if (mess.video_info && mess.source == "local") {
             room.waiting = true;
             console.log("Waiting for message...");
@@ -131,5 +164,27 @@ browser.runtime.onConnect.addListener(port => {
                 );
             room.video_info = mess.video_info;
         }
-    });
+    };
+    const awaitVideos = mess => {
+        if (mess.videos != null) {
+            port.videos = mess.videos;
+            if (port.videos == 0) {
+                port.disconnect();
+            }
+            else {
+                port.onMessage.addListener(listenInfo);
+                port.onMessage.removeListener(awaitVideos);
+                room.port = port;
+                browser.browserAction.setBadgeText({text: room.count.toString()});
+                browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
+                port.onDisconnect.addListener(() => {
+                    room.port = null;
+                    browser.browserAction.setBadgeText({text: "!"});
+                    browser.browserAction.setBadgeBackgroundColor({color: "#d83131"});
+                });
+                port.postMessage({select_video: {id: 0}});
+            }
+        }
+    };
+    port.onMessage.addListener(awaitVideos);
 });
