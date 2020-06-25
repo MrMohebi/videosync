@@ -11,6 +11,11 @@
       "64": "img/3d-glasses_inactive_64.png"
     }
   },
+  "icons": {
+    "16": "img/3d-glasses_active_16.png",
+    "48": "img/3d-glasses_active_48.png",
+    "128": "img/3d-glasses_active_128.png"
+  },
   "description": "VideoSync is a browser extension that makes watching videos together easier.",
   "manifest_version": 2,
   "name": "VideoSync",
