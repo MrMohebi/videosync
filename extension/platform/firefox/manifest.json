@@ -30,8 +30,7 @@
   },
   "permissions": [
     "storage",
-    "activeTab",
-    "notifications"
+    "activeTab"
   ],
   "optional_permissions": [
     "<all_urls>"
