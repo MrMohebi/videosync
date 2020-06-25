@@ -27,10 +27,10 @@ share_page_button.addEventListener("click",
 );
 
 browser.tabs.query({active: true, currentWindow: true})
-    .then(tabs => tabs[0].id)
-    .then(tabid => browser.webNavigation.getAllFrames({tabId: tabid})
+    .then(tabs => [tabs[0].id, tabs[0].url])
+    .then(([tabid, url]) => browser.webNavigation.getAllFrames({tabId: tabid})
         .then(frames => select_video_button.addEventListener("click",
-            () => browser.permissions.request({origins: frames.map(f => f.url).filter(s => s.startsWith("http"))})
+            () => browser.permissions.request({origins: frames.map(f => f.url).filter(s => s.startsWith("http")).map(s => (new URL(s)).origin).filter(s => s != (new URL(url)).origin).map(s => s + "/*")})
                 .then(() => browser.runtime.sendMessage({select_video: {tabid: tabid}}))
                 .then(() => window.close())
         )));
