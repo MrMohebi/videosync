@@ -20,7 +20,11 @@
   "permissions": [
     "storage",
     "activeTab",
-    "notifications"
+    "notifications",
+    "webNavigation"
+  ],
+  "optional_permissions": [
+    "<all_urls>"
   ],
   "version": "0.0.2"
 }

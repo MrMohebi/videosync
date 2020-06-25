@@ -26,12 +26,14 @@ share_page_button.addEventListener("click",
         .then(() => window.close())
 );
 
-select_video_button.addEventListener("click",
-    () => browser.tabs.query({active: true, currentWindow: true})
-        .then(tabs => tabs[0].id)
-        .then(tabid => browser.runtime.sendMessage({select_video: {tabid: tabid}}))
-        .then(() => window.close())
-);
+browser.tabs.query({active: true, currentWindow: true})
+    .then(tabs => tabs[0].id)
+    .then(tabid => browser.webNavigation.getAllFrames({tabId: tabid})
+        .then(frames => select_video_button.addEventListener("click",
+            () => browser.permissions.request({origins: frames.map(f => f.url).filter(s => s.startsWith("http"))})
+                .then(() => browser.runtime.sendMessage({select_video: {tabid: tabid}}))
+                .then(() => window.close())
+        )));
 
 username_input.addEventListener("input",
     () => browser.storage.local.set({username: username_input.value})
