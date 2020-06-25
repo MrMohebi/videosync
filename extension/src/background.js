@@ -143,6 +143,7 @@ browser.runtime.onConnect.addListener(port => {
     if (!room.tabId || room.tabId != port.sender.tab.id) {
         ports.forEach(p => p.disconnect());
         ports = [];
+        room.iframes = [];
         room.tabId = port.sender.tab.id;
     }
     ports.push(port);
@@ -159,6 +160,10 @@ browser.runtime.onConnect.addListener(port => {
         }
     };
     const awaitVideos = mess => {
+        if (mess.iframes != null) {
+            room.iframes = [...(room.iframes || []), ...mess.iframes];
+            console.log(room.iframes);
+        }
         if (mess.videos != null) {
             port.videos = mess.videos;
             if (port.videos == 0) {

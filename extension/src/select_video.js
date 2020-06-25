@@ -72,11 +72,12 @@
         }
     }
 
-    var notification_overlay,
-        video;
+    var notification_overlay, video;
     var videos = document.getElementsByTagName("video");
+    var iframes = document.getElementsByTagName("iframe");
     var port = browser.runtime.connect({name: "video_selector"});
     port.onMessage.addListener(handleMess);
+    port.postMessage({iframes: [...iframes].map(f => f.src)});
     port.postMessage({videos: videos.length, source: "local"});
     port.onDisconnect.addListener(() => {
         if (notification_overlay) {
