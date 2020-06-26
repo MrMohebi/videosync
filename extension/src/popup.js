@@ -44,7 +44,7 @@ browser.runtime.sendMessage({get_room: {properties: ["path"]}})
         if (room == null || room.path == null) {
             share_page_button.disabled = leave_room_button.disabled = select_video_button.disabled = true;
             share_page_button.style.display = leave_room_button.style.display = select_video_button.style.display = "none";
-            room_name_input.value = [...Array(10)].map(() => Math.random().toString(36)[2]).join("");
+            browser.storage.local.get("last_room").then(res => room_name_input.value = res.last_room);
         }
         else {
             room_name_input.value = room.path;

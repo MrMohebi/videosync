@@ -49,6 +49,12 @@ browser.storage.local.get("server").then(res => {
     }
 });
 
+browser.storage.local.get("last_room").then(res => {
+    if (!res.last_room) {
+        browser.storage.local.set({last_room: [...Array(10)].map(() => Math.random().toString(36)[2]).join("")});
+    }
+});
+
 function displayNotification(title, message) {
     if (room.port) {
         room.port.postMessage({notification: {title: title, message: message}});
@@ -90,6 +96,7 @@ browser.runtime.onMessage.addListener(
                     room.path = path;
                 });
                 ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
+                browser.storage.local.set({last_room: path});
             };
             connect(request.join_room.room);
             ws_prom.then(ws => ws.onclose = ws.onerror = () => {
