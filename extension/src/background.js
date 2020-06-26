@@ -78,7 +78,7 @@ browser.runtime.onMessage.addListener(
         if (request.join_room && !room.path) {
             const server = request.join_room.server;
             const connect = (path) => {
-                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + room.path); ws.onopen = () => resolve(ws);});
+                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + path); ws.onopen = () => resolve(ws);});
                 ws_prom.then(() => {
                     browser.browserAction.setIcon({
                         path: {
