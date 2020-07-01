@@ -83,9 +83,17 @@ browser.runtime.onMessage.addListener(
         }
         if (request.join_room && !room.path) {
             const server = request.join_room.server;
-            const connect = (path) => {
+            const connect = (path, onclose) => {
                 ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + path); ws.onopen = () => resolve(ws);});
                 ws_prom.then(() => {
+                    if (room.port) {
+                        browser.browserAction.setBadgeText({text: room.count.toString()});
+                        browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
+                    }
+                    else {
+                        browser.browserAction.setBadgeText({text: "!"});
+                        browser.browserAction.setBadgeBackgroundColor({color: "#d83131"});
+                    }
                     browser.browserAction.setIcon({
                         path: {
                             16: "img/3d-glasses_active_16.png",
@@ -96,10 +104,10 @@ browser.runtime.onMessage.addListener(
                     room.path = path;
                 });
                 ws_prom.then(ws => ws.onmessage = (ev) => onMessage(JSON.parse(ev.data)));
+                ws_prom.then(ws => ws.onclose = onclose);
                 browser.storage.local.set({last_room: path});
             };
-            connect(request.join_room.room);
-            ws_prom.then(ws => ws.onclose = ws.onerror = () => {
+            const onclose = () => {
                 browser.browserAction.setBadgeText({text: ""});
                 browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
                 browser.browserAction.setIcon({
@@ -113,9 +121,10 @@ browser.runtime.onMessage.addListener(
                 room.path = null;
                 if (path) {
                     displayNotification("VideoSync Warning", "Disconnected, trying to reconnect");
-                    connect(path);
+                    connect(path, onclose);
                 }
-            });
+            };
+            connect(request.join_room.room, onclose);
         }
         if (request.leave_room) {
             if (room.path) {
@@ -169,7 +178,6 @@ browser.runtime.onConnect.addListener(port => {
     const awaitVideos = mess => {
         if (mess.iframes != null) {
             room.iframes = [...(room.iframes || []), ...mess.iframes];
-            console.log(room.iframes);
         }
         if (mess.videos != null) {
             port.videos = mess.videos;
