@@ -5,12 +5,15 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
+    <input type="text" placeholder="username" id="username">
     <input type="text" placeholder="room name" id="room_name">
     <input type="button" value="Join room" id="join_room">
     <input type="button" value="Leave room" id="leave_room">
     <input type="button" value="Share this page" id="share_page">
     <input type="button" value="Select video" id="select_video">
-    <input type="text" placeholder="username" id="username">
+    <table id="usernames">
+      <tr><th colspan="2">People in room:</th></tr>
+    </table>
     <script src="browser-polyfill.min.js"></script>
     <script src="popup.js"></script>
   </body>

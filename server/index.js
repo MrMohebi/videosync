@@ -3,31 +3,39 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 wss.on("connection", function (ws, req) {
     ws.url = req.url;
-    console.log(req.url);
-    const sendCount = () => [...wss.clients]
+    const sendUsernames = () => [...wss.clients]
         .filter(client => req.url == client.url && client.readyState === WebSocket.OPEN)
-        .forEach((client, _, arr) => client.send(JSON.stringify({roomCnt: arr.length})));
-
-    sendCount();
+        .forEach((client, _, arr) => {
+            client.send(JSON.stringify({usernames: arr.map(c => ({username: c.username, status: c.status}))}));
+            console.log("Sent usernames");
+        });
 
     ws.on("pong", () => {ws.isAlive = true; ws.latency = (Date.now() - ws.lastPing)/2;});
 
     ws.on("message", message => {
+        message = JSON.parse(message);
         console.log(message);
+        if (message.status) {
+            if (message.username) {
+                ws.username = message.username;
+            }
+            ws.status = message.status;
+            sendUsernames();
+            return;
+        }
         wss.clients.forEach(client => {
-            console.log(client.url);
             if (req.url == client.url && client.readyState === WebSocket.OPEN) {
                 if (client === ws) {
                     client.send(JSON.stringify({ok: message}));
                 }
                 else {
-                    client.send(JSON.stringify({peer_message: JSON.parse(message), sender_latency: ws.latency, receiver_latency: client.latency}));
+                    client.send(JSON.stringify({peer_message: message, sender_latency: ws.latency, receiver_latency: client.latency, sender_username: ws.username}));
                 }
             }
         });
     });
 
-    ws.on("close", () => {sendCount(); console.log("client left");});
+    ws.on("close", () => {sendUsernames(); console.log(ws.username + " left room " + ws.url);});
 });
 
 const interval = setInterval(function ping() {
