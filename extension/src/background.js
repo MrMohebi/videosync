@@ -1,6 +1,8 @@
 var room = {},
     ws_prom = new Promise(resolve => resolve(null));
 
+const server_version = "0.0.2";
+
 function updateBadge() {
     ws_prom.then(ws => {
         if (ws != null && ws.readyState == WebSocket.OPEN) {
@@ -100,7 +102,7 @@ browser.runtime.onMessage.addListener(
             const server = request.join_room.server;
             browser.storage.local.set({username: request.join_room.username});
             const connect = (path, onclose) => {
-                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + path); ws.onopen = () => resolve(ws);});
+                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onopen = () => resolve(ws);});
                 return Promise.all([
                     browser.storage.local.set({last_room: path}),
                     ws_prom.then(ws => {

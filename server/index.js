@@ -1,8 +1,11 @@
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8080 });
 
+wss.shouldHandle = req => req.url.startsWith("/" + require('./package.json').version + "/");
+
 wss.on("connection", function (ws, req) {
     ws.url = req.url;
+    console.log(ws.url);
     const sendUsernames = () => [...wss.clients]
         .filter(client => req.url == client.url && client.readyState === WebSocket.OPEN)
         .forEach((client, _, arr) => {
@@ -14,7 +17,6 @@ wss.on("connection", function (ws, req) {
 
     ws.on("message", message => {
         message = JSON.parse(message);
-        console.log(message);
         if (message.status) {
             if (message.username) {
                 ws.username = message.username;
