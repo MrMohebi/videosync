@@ -5,12 +5,10 @@ wss.shouldHandle = req => req.url.startsWith("/" + require('./package.json').ver
 
 wss.on("connection", function (ws, req) {
     ws.url = req.url;
-    console.log(ws.url);
     const sendUsernames = () => [...wss.clients]
         .filter(client => req.url == client.url && client.readyState === WebSocket.OPEN)
         .forEach((client, _, arr) => {
             client.send(JSON.stringify({usernames: arr.map(c => ({username: c.username, status: c.status}))}));
-            console.log("Sent usernames");
         });
 
     ws.on("pong", () => {ws.isAlive = true; ws.latency = (Date.now() - ws.lastPing)/2;});
@@ -37,7 +35,7 @@ wss.on("connection", function (ws, req) {
         });
     });
 
-    ws.on("close", () => {sendUsernames(); console.log(ws.username + " left room " + ws.url);});
+    ws.on("close", () => {sendUsernames();});
 });
 
 const interval = setInterval(function ping() {
