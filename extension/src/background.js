@@ -38,10 +38,6 @@ function updateBadge() {
 browser.runtime.onStartup.addListener(updateBadge);
 
 function onMessage(mess) {
-    if (!room.mess_log) {
-        room.mess_log = [];
-    }
-    room.mess_log.push(mess);
     if (mess.usernames) {
         room.usernames = mess.usernames;
         updateBadge();
@@ -140,8 +136,14 @@ browser.runtime.onMessage.addListener(
             displayNotification(request.notification.title, request.notification.message);
         }
         if (request.select_video) {
+            if (room.port) {
+                room.port = null;
+                ws_prom.then(ws => ws.send(JSON.stringify({status: {ready: false}})));
+                updateBadge();
+            }
             ports.forEach(p => p.disconnect());
             ports = [];
+            room.iframes = [];
             return browser.tabs.executeScript(request.select_video.tabid, {allFrames: true, matchAboutBlank: true, file: "browser-polyfill.min.js"})
                 .then(() => browser.tabs.executeScript(request.select_video.tabid, {allFrames: true, matchAboutBlank: true, file: "select_video.js"}));
         }
@@ -152,6 +154,11 @@ var ports = [];
 
 browser.runtime.onConnect.addListener(port => {
     if (!room.tabId || room.tabId != port.sender.tab.id) {
+        if (room.port) {
+            room.port = null;
+            ws_prom.then(ws => ws.send(JSON.stringify({status: {ready: false}})));
+            updateBadge();
+        }
         ports.forEach(p => p.disconnect());
         ports = [];
         room.iframes = [];
