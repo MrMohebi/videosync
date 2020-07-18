@@ -1,0 +1,14 @@
+VideoSync is a browser extension that makes watching videos together easier. Any video on a website, as long as it is served with a <video> tag (i.e. if it's not a GIF or a Flash video), should work with VideoSync.
+
+To watch a video with others on VideoSync, make sure that all parties have the extension installed. Once everyone joins the same room, links can be shared between members. Then, each member must select a video on a website. Finally, everyone can start watching the same video, staying synchronized each time someone pauses or rewinds the video.
+
+Everything should be properly synchronized, such as when somebody pauses, resumes or rewinds the video, or even changes the playback speed. In order to help people get on the same video, the extension has a "Share this page" button to send the current tab to everyone else's browser. Furthermore, it is in fact not necessary for everybody to select the same video, so if somebody wishes to use a different streaming service for the same content, they can just select the video on that website (note however that a warning will be shown if the durations of the videos do not exactly match).
+
+Websites and video players that have been tested with VideoSync:
+
+Netflix
+Youtube
+Vimeo
+Twitter
+Plex
+JW Player
