@@ -60,6 +60,7 @@ room_prom.then(room => {
                 status_td = document.createElement("td");
             name_td.innerText = user.username;
             status_td.innerText = user.status.ready?"ready":"not ready";
+            status_td.style.textAlign = "right";
             usernames_table.appendChild(tr);
             tr.appendChild(name_td);
             tr.appendChild(status_td);

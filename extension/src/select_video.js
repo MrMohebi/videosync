@@ -33,7 +33,7 @@
             video.addEventListener("waiting", updateVideo);
             video.addEventListener("ratechange", updateVideo);
         }
-        if (mess.notification) {
+        if (mess.notification && notification_overlay) {
             clearTimeout(notification_overlay.timeout);
             notification_overlay.style.display = "block";
             notification_overlay.innerText = mess.notification.title + ": " + mess.notification.message;
