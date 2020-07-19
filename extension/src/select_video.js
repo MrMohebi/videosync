@@ -11,11 +11,12 @@
     }
 
     function updateVideo() {
-        if (notification_overlay) {
-            notification_overlay.parentElement.removeChild(notification_overlay);
+        if (ignoreUpdates > 0) {
+            ignoreUpdates -= 1;
         }
-        notification_overlay = createVideoOverlay(video);
-        port.postMessage({video_info: {duration: video.duration, paused: video.paused, currentTime: video.currentTime, playbackRate: video.playbackRate}, source: "local"});
+        else {
+            port.postMessage({video_info: {duration: video.duration, paused: video.paused, currentTime: video.currentTime, playbackRate: video.playbackRate}, source: "local"});
+        }
     }
 
     function handleMess(mess) {
@@ -24,13 +25,14 @@
         }
         if (mess.select_video) {
             video = videos[mess.select_video.id];
-
+            if (notification_overlay) {
+                notification_overlay.parentElement.removeChild(notification_overlay);
+            }
+            notification_overlay = createVideoOverlay(video);
             updateVideo();
             video.addEventListener("pause", updateVideo);
-            video.addEventListener("play", updateVideo);
-            video.addEventListener("seeked", updateVideo);
             video.addEventListener("seeking", updateVideo);
-            video.addEventListener("waiting", updateVideo);
+            video.addEventListener("playing", updateVideo);
             video.addEventListener("ratechange", updateVideo);
         }
         if (mess.notification && notification_overlay) {
@@ -47,31 +49,30 @@
             if (mess.video_info.paused != null && mess.video_info.paused != video.paused) {
                 if (video.paused) {
                     displayNotification("VideoSync", username + " resumed");
-                    video.removeEventListener("play", updateVideo);
+                    ignoreUpdates += 1;
                     video.play();
-                    video.addEventListener("play", updateVideo);
                 }
                 else {
                     displayNotification("VideoSync", username + " paused");
-                    video.removeEventListener("pause", updateVideo);
+                    ignoreUpdates += 1;
                     video.pause();
-                    video.addEventListener("pause", updateVideo);
                 }
             }
             if (mess.video_info.playbackRate != null && mess.video_info.playbackRate != video.playbackRate) {
                 displayNotification("VideoSync", username + " set playback speed to " + mess.video_info.playbackRate);
-                video.removeEventListener("ratechange", updateVideo);
+                ignoreUpdates += 1;
                 video.playbackRate = mess.video_info.playbackRate;
-                video.addEventListener("ratechange", updateVideo);
             }
             const latency = mess.video_info.paused?0:mess.latency*video.playbackRate;
             if (mess.video_info.currentTime != null && Math.abs(mess.video_info.currentTime + latency - video.currentTime) > 0.5*video.playbackRate + latency) {
                 displayNotification("VideoSync", username + " seeking");
+                ignoreUpdates += 1;
                 video.currentTime = mess.video_info.currentTime + latency;
             }
         }
     }
 
+    var ignoreUpdates = 0;
     var notification_overlay, video;
     var videos = document.getElementsByTagName("video");
     var iframes = document.getElementsByTagName("iframe");

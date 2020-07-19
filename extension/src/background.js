@@ -150,7 +150,8 @@ browser.runtime.onMessage.addListener(
     }
 );
 
-var ports = [];
+var ports = [],
+    last_mess;
 
 browser.runtime.onConnect.addListener(port => {
     if (!room.tabId || room.tabId != port.sender.tab.id) {
@@ -168,9 +169,16 @@ browser.runtime.onConnect.addListener(port => {
 
     const listenInfo = mess => {
         if (mess.video_info && mess.source == "local") {
-            room.waiting = true;
-            ws_prom.then(ws => ws.send(JSON.stringify({video_info: mess.video_info})));
-            room.video_info = mess.video_info;
+            const ts = Date.now();
+            if (last_mess && ts - last_mess.ts < 1000 && last_mess.video_info.paused == mess.video_info.paused && last_mess.video_info.playbackRate == mess.video_info.playbackRate && Math.abs(last_mess.video_info.currentTime - mess.video_info.currentTime) < 0.00001) {
+                console.log("Ignoring repeated message");
+            }
+            else {
+                room.waiting = true;
+                last_mess = {ts: ts, video_info: mess.video_info};
+                ws_prom.then(ws => ws.send(JSON.stringify({video_info: mess.video_info})));
+                room.video_info = mess.video_info;
+            }
         }
     };
     const awaitVideos = mess => {
