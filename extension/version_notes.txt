@@ -1,0 +1,3 @@
+Fixed icons not updating correctly
+Show usernames and status of connected users on popup
+Fixed feedback loops causing jitter with many concurrent users
