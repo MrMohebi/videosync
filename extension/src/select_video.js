@@ -64,7 +64,7 @@
                 video.playbackRate = mess.video_info.playbackRate;
             }
             const latency = mess.video_info.paused?0:mess.latency*video.playbackRate;
-            if (mess.video_info.currentTime != null && Math.abs(mess.video_info.currentTime + latency - video.currentTime) > 0.5*video.playbackRate + latency) {
+            if (mess.video_info.currentTime != null && Math.abs(mess.video_info.currentTime + latency - video.currentTime) > 0.5*video.playbackRate) {
                 displayNotification("VideoSync", username + " seeking");
                 ignoreUpdates += 1;
                 video.currentTime = mess.video_info.currentTime + latency;
