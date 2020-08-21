@@ -100,11 +100,11 @@ browser.runtime.onMessage.addListener(
             const connect = (path, onclose) => {
                 return Promise.all([
                     browser.storage.local.set({last_room: path}),
-                    ws_prom.then(ws => {
+                    ws_prom.then(ws => ws, () => null).then(ws => {
                         if (ws) {
                             ws.close();
                         }
-                        ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onopen = () => resolve(ws);});
+                        ws_prom = new Promise((resolve, reject) => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onclose = () => reject("Connection failed"); ws.onopen = () => resolve(ws);});
                         return ws_prom;
                     }).then(ws => {
                         updateBadge();
