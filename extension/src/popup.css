@@ -20,3 +20,26 @@ body * {
 input {
   margin-bottom: 1px;
 }
+
+input[type=checkbox] {
+  position: relative;
+  top: 1px;
+  margin: 0;
+}
+
+label {
+  display: inline-block;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+fieldset {
+  padding: 0.3em;
+}
+
+table {
+  width: 100%;
+}

@@ -5,15 +5,20 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <input type="text" placeholder="username" id="username">
-    <input type="text" placeholder="room name" id="room_name">
-    <input type="button" value="Join room" id="join_room">
-    <input type="button" value="Leave room" id="leave_room">
-    <input type="button" value="Share this page" id="share_page">
+    <form id="join">
+      <input type="text" placeholder="username" id="username">
+      <input type="text" placeholder="room name" id="room_name">
+      <label for="use_latency">Adjust for latency: <input type="checkbox" id="use_latency" checked></label>
+      <input type="submit" value="Join" id="join_room">
+    </form>
+
     <input type="button" value="Select video" id="select_video">
-    <table id="usernames">
-      <tr><th colspan="2">People in room:</th></tr>
-    </table>
+    <input type="button" value="Share this page" id="share_page">
+    <fieldset id="room_info">
+      <legend id="room"></legend>
+      <table id="usernames"></table>
+      <input type="button" value="Leave" id="leave_room" style="margin-top: 1.5em">
+    </fieldset>
     <script src="browser-polyfill.min.js"></script>
     <script src="popup.js"></script>
   </body>

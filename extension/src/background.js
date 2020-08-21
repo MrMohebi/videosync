@@ -44,7 +44,7 @@ function onMessage(mess) {
     }
     if (mess.peer_message && mess.peer_message.video_info) {
         if (room.port && !room.waiting) {
-            room.port.postMessage({video_info: mess.peer_message.video_info, source: "server", latency: (mess.sender_latency + mess.receiver_latency)/1000, username: mess.sender_username});
+            room.port.postMessage({video_info: mess.peer_message.video_info, source: "server", latency: room.use_latency?(mess.sender_latency + mess.receiver_latency)/1000:0, username: mess.sender_username});
         }
     }
     if (mess.ok) {
@@ -58,7 +58,7 @@ function onMessage(mess) {
 
 browser.storage.local.get("server").then(res => {
     if (!res.server) {
-        browser.storage.local.set({server: "tame-occipital-sing.glitch.me"});
+        browser.storage.local.set({server: "localhost:8080"});
     }
 });
 
@@ -96,6 +96,7 @@ browser.runtime.onMessage.addListener(
         }
         if (request.join_room && !room.path) {
             const server = request.join_room.server;
+            room.use_latency = request.join_room.use_latency;
             browser.storage.local.set({username: request.join_room.username});
             const connect = (path, onclose) => {
                 return Promise.all([

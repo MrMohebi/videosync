@@ -1,23 +1,27 @@
 const select_video_button = document.getElementById("select_video"),
-    join_room_button = document.getElementById("join_room"),
+    //join_room_submit = document.getElementById("join_room"),
     leave_room_button = document.getElementById("leave_room"),
     share_page_button = document.getElementById("share_page"),
     username_input = document.getElementById("username"),
     room_name_input = document.getElementById("room_name"),
-    usernames_table = document.getElementById("usernames");
+    use_latency_checkbox = document.getElementById("use_latency"),
+    usernames_table = document.getElementById("usernames"),
+    room_info_fieldset = document.getElementById("room_info"),
+    room_legend = document.getElementById("room"),
+    join_form = document.getElementById("join");
 
-const room_prom = browser.runtime.sendMessage({get_room: {properties: ["iframes", "path"]}});
+const room_prom = browser.runtime.sendMessage({get_room: {properties: ["iframes", "path", "use_latency"]}});
 
-join_room_button.addEventListener("click",
+join_form.addEventListener("submit",
     () => browser.storage.local.get("server")
         .then(res => res.server)
         .then(server => {
             if (room_name_input.value && username_input.value) {
                 return browser.runtime.sendMessage({
-                    join_room: {room: room_name_input.value, server: server, username: username_input.value}
+                    join_room: {room: room_name_input.value, server: server, username: username_input.value, use_latency: use_latency_checkbox.checked}
                 });
             }
-        }).then(() => window.close(), () => window.close())
+        })
 );
 
 leave_room_button.addEventListener("click",
@@ -42,13 +46,12 @@ browser.tabs.query({active: true, currentWindow: true})
 
 room_prom.then(room => {
     if (room == null || room.path == null) {
-        usernames_table.style.display = share_page_button.style.display = leave_room_button.style.display = select_video_button.style.display = "none";
+        room_info_fieldset.style.display = share_page_button.style.display = select_video_button.style.display = "none";
         browser.storage.local.get("last_room").then(res => room_name_input.value = res.last_room);
     }
     else {
-        room_name_input.value = room.path;
-        username_input.disabled = room_name_input.disabled = true;
-        join_room_button.style.display = "none";
+        room_legend.innerText = room.path;
+        join_form.style.display = "none";
     }
 });
 
@@ -59,7 +62,7 @@ browser.storage.local.get("username")
 function refreshData() {
     browser.runtime.sendMessage({get_room: {properties: ["usernames"]}}).then(room => {
         if (room != null && room.usernames != null) {
-            while (usernames_table.rows.length > 1) {
+            while (usernames_table.rows.length > 0) {
                 usernames_table.deleteRow(-1);
             }
             room.usernames.forEach(user => {
