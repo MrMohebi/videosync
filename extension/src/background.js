@@ -98,10 +98,15 @@ browser.runtime.onMessage.addListener(
             const server = request.join_room.server;
             browser.storage.local.set({username: request.join_room.username});
             const connect = (path, onclose) => {
-                ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onopen = () => resolve(ws);});
                 return Promise.all([
                     browser.storage.local.set({last_room: path}),
                     ws_prom.then(ws => {
+                        if (ws) {
+                            ws.close();
+                        }
+                        ws_prom = new Promise(resolve => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onopen = () => resolve(ws);});
+                        return ws_prom;
+                    }).then(ws => {
                         updateBadge();
                         room.path = path;
                         ws.onmessage = (ev) => onMessage(JSON.parse(ev.data));
