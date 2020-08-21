@@ -3,7 +3,10 @@
   "version": "0.0.2",
   "description": "",
   "main": "index.js",
-  "scripts": { "start": "node index.js" },
+  "scripts": {
+    "start": "node index.js",
+    "debug": "node index.js --emulate-latency --log"
+  },
   "author": "Rafael Ketsetsides",
   "license": "GPL-3",
   "dependencies": {

@@ -1,9 +1,36 @@
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8080 });
-
+const flags = process.argv.slice(2).reduce((dict, cur) => {
+    const spl = cur.split("=");
+    if (spl.length == 1) {
+        dict[spl[0]] = true;
+    }
+    else {
+        dict[spl[0]] = spl[1];
+    }
+    return dict;
+}, {});
 wss.shouldHandle = req => req.url.startsWith("/" + require('./package.json').version + "/");
 
+function log() {
+    if (flags["--log"]) {
+        console.log.apply(console, arguments);
+    }
+}
+
 wss.on("connection", function (ws, req) {
+    if (flags["--emulate-latency"]) {
+        (function(mean_latency) {
+            var oldEmit = ws.emit;
+            ws.emit = function() {
+                var args = Array.from(arguments);
+                setTimeout(() => {
+                    oldEmit.apply(this, args);
+                }, mean_latency + (Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random())/6);
+            };
+        })(Math.random()*2000);
+    }
+
     ws.url = req.url;
     const sendUsernames = () => [...wss.clients]
         .filter(client => req.url == client.url && client.readyState === WebSocket.OPEN)
@@ -15,6 +42,7 @@ wss.on("connection", function (ws, req) {
 
     ws.on("message", message => {
         message = JSON.parse(message);
+        log(ws.username, message);
         if (message.status) {
             if (message.username) {
                 ws.username = message.username;
