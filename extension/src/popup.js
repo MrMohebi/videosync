@@ -6,7 +6,7 @@ const select_video_button = document.getElementById("select_video"),
     room_name_input = document.getElementById("room_name"),
     usernames_table = document.getElementById("usernames");
 
-const room_prom = browser.runtime.sendMessage({get_room: {properties: ["iframes", "path", "usernames"]}});
+const room_prom = browser.runtime.sendMessage({get_room: {properties: ["iframes", "path"]}});
 
 join_room_button.addEventListener("click",
     () => browser.storage.local.get("server")
@@ -52,22 +52,27 @@ room_prom.then(room => {
     }
 });
 
-room_prom.then(room => {
-    if (room != null && room.usernames != null) {
-        room.usernames.forEach(user => {
-            var tr = document.createElement("tr"),
-                name_td = document.createElement("td"),
-                status_td = document.createElement("td");
-            name_td.innerText = user.username;
-            status_td.innerText = user.status.ready?"ready":"not ready";
-            status_td.style.textAlign = "right";
-            usernames_table.appendChild(tr);
-            tr.appendChild(name_td);
-            tr.appendChild(status_td);
-        });
-    }
-});
-
 browser.storage.local.get("username")
     .then(res => res.username)
     .then(username => {if (username) { username_input.value = username; } });
+
+function refreshData() {
+    browser.runtime.sendMessage({get_room: {properties: ["usernames"]}}).then(room => {
+        if (room != null && room.usernames != null) {
+            while (usernames_table.rows.length > 1) {
+                usernames_table.deleteRow(-1);
+            }
+            room.usernames.forEach(user => {
+                var tr = usernames_table.insertRow(-1);
+                var name_td = tr.insertCell(0);
+                var status_td = tr.insertCell(1);
+                name_td.innerText = user.username;
+                status_td.innerText = user.status.ready?"ready":"not ready";
+                status_td.style.textAlign = "right";
+            });
+        }
+    });
+}
+
+refreshData();
+setInterval(refreshData, 1000);
