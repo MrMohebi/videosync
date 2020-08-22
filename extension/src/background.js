@@ -58,7 +58,7 @@ function onMessage(mess) {
 
 browser.storage.local.get("server").then(res => {
     if (!res.server) {
-        browser.storage.local.set({server: "localhost:8080"});
+        browser.storage.local.set({server: "tame-occipital-sing.glitch.me"});
     }
 });
 
