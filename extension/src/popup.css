@@ -1,4 +1,4 @@
-html, body {
+html, body, span {
   background: transparent;
   box-sizing: border-box;
   color: #222426;
@@ -15,6 +15,7 @@ body * {
   text-align: start;
   font: caption;
   margin: 0px;
+  white-space: nowrap;
 }
 
 input {
@@ -42,4 +43,13 @@ fieldset {
 
 table {
   width: 100%;
+  border-collapse: collapse;
+}
+
+td {
+  border: 0px solid transparent;
+}
+
+tr > td + td {
+  border-left-width: 2em;
 }

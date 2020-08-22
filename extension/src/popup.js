@@ -6,7 +6,7 @@ const select_video_button = document.getElementById("select_video"),
     room_name_input = document.getElementById("room_name"),
     use_latency_checkbox = document.getElementById("use_latency"),
     usernames_table = document.getElementById("usernames"),
-    room_info_fieldset = document.getElementById("room_info"),
+    room_info_span = document.getElementById("room_info"),
     room_legend = document.getElementById("room"),
     join_form = document.getElementById("join");
 
@@ -18,7 +18,7 @@ join_form.addEventListener("submit",
         .then(server => {
             if (room_name_input.value && username_input.value) {
                 return browser.runtime.sendMessage({
-                    join_room: {room: room_name_input.value, server: server, username: username_input.value, use_latency: use_latency_checkbox.checked}
+                    join_room: {room: room_name_input.value, server: server, username: username_input.value, use_latency: true}
                 });
             }
         })
@@ -36,6 +36,10 @@ share_page_button.addEventListener("click",
         .then(() => window.close(), () => window.close())
 );
 
+use_latency_checkbox.addEventListener("change",
+    () => browser.runtime.sendMessage({set_room: {properties: {"use_latency": use_latency_checkbox.checked}}})
+);
+
 browser.tabs.query({active: true, currentWindow: true})
     .then(tabs => [tabs[0].id, tabs[0].url])
     .then(([tabid, url]) => room_prom.then(room => select_video_button.addEventListener("click",
@@ -46,11 +50,12 @@ browser.tabs.query({active: true, currentWindow: true})
 
 room_prom.then(room => {
     if (room == null || room.path == null) {
-        room_info_fieldset.style.display = share_page_button.style.display = select_video_button.style.display = "none";
+        room_info_span.style.display = "none";
         browser.storage.local.get("last_room").then(res => room_name_input.value = res.last_room);
     }
     else {
         room_legend.innerText = room.path;
+        use_latency_checkbox.checked = room.use_latency;
         join_form.style.display = "none";
     }
 });

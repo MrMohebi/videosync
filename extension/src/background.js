@@ -94,6 +94,11 @@ browser.runtime.onMessage.addListener(
                 resolve(ret_room);
             });
         }
+        if (request.set_room) {
+            Object.entries(request.set_room.properties).forEach(([prop, val]) => {
+                room[prop] = val;
+            });
+        }
         if (request.join_room && !room.path) {
             const server = request.join_room.server;
             room.use_latency = request.join_room.use_latency;
