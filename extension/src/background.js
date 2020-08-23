@@ -1,5 +1,6 @@
 var room = {},
     ws_prom = new Promise(resolve => resolve(null));
+ws_prom.done = true;
 
 const server_version = "0.0.2";
 
@@ -99,7 +100,7 @@ browser.runtime.onMessage.addListener(
                 room[prop] = val;
             });
         }
-        if (request.join_room && !room.path) {
+        if (request.join_room && !room.path && ws_prom.done) {
             const server = request.join_room.server;
             room.use_latency = request.join_room.use_latency;
             browser.storage.local.set({username: request.join_room.username});
@@ -107,10 +108,11 @@ browser.runtime.onMessage.addListener(
                 return Promise.all([
                     browser.storage.local.set({last_room: path}),
                     ws_prom.then(ws => ws, () => null).then(ws => {
-                        if (ws) {
-                            ws.close();
+                        if (ws != null && ws.readyState == WebSocket.OPEN) {
+                            return ws_prom;
                         }
-                        ws_prom = new Promise((resolve, reject) => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onclose = () => reject("Connection failed"); ws.onopen = () => resolve(ws);});
+                        ws_prom = new Promise((resolve, reject) => {var ws = new WebSocket("ws://" + server + "/" + server_version + "/" + path); ws.onopen = () => resolve(ws); ws.onclose = () => reject(ws);});
+                        ws_prom.then(() => ws_prom.done = true, () => ws_prom.done = true);
                         return ws_prom;
                     }).then(ws => {
                         updateBadge();
