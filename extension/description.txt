@@ -1,10 +1,4 @@
-VideoSync is a browser extension that makes watching videos together easier. Any video on a website, as long as it is served with a <video> tag (i.e. if it's not a GIF or a Flash video), should work with VideoSync.
-
-To watch a video with others on VideoSync, make sure that all parties have the extension installed. Once everyone joins the same room, links can be shared between members. Then, each member must select a video on a website. Finally, everyone can start watching the same video, staying synchronized each time someone pauses or rewinds the video.
-
-Everything should be properly synchronized, such as when somebody pauses, resumes or rewinds the video, or even changes the playback speed. In order to help people get on the same video, the extension has a "Share this page" button to send the current tab to everyone else's browser. Furthermore, it is in fact not necessary for everybody to select the same video, so if somebody wishes to use a different streaming service for the same content, they can just select the video on that website (note however that a warning will be shown if the durations of the videos do not exactly match).
-
-Websites and video players that have been tested with VideoSync:
+VideoSync is a browser extension that makes watching videos together easier. Any modern video player on any website should work with VideoSync. The following websites and video players have been tested with VideoSync:
 
 Netflix
 Youtube
@@ -12,3 +6,7 @@ Vimeo
 Twitter
 Plex
 JW Player
+
+To watch a video with others on VideoSync, make sure that all parties have the extension installed. Once everyone is in the same room, they can each select the video they want to watch; while it is recommended that everyone use the same video, people can choose to use different streaming providers if they want. Once everyone is ready, the video players will be sync and you can start watching the video at the same time.
+
+Playing, pausing, rewinding, or even changing the playback speed are synchronized. The extension attempts to adjust for latency in order to keep everyone synchronized, but this may cause unexpected skipping, so if you wish to turn it off you can uncheck the "Adjust for latency" checkbox.
