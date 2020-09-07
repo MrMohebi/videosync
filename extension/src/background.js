@@ -17,10 +17,12 @@ function updateBadge() {
             if (room.port) {
                 browser.browserAction.setBadgeText({text: room.usernames.length.toString()});
                 browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
+                browser.browserAction.setTitle({title: "VideoSync: synced"});
             }
             else {
                 browser.browserAction.setBadgeText({text: "!"});
                 browser.browserAction.setBadgeBackgroundColor({color: "#d83131"});
+                browser.browserAction.setTitle({title: "VideoSync: select video"});
             }
         }
         else {
@@ -32,6 +34,7 @@ function updateBadge() {
                 }
             });
             browser.browserAction.setBadgeText({text: ""});
+            browser.browserAction.setTitle({title: "VideoSync"});
         }
     });
 }

@@ -6,19 +6,19 @@
   </head>
   <body>
     <form id="join">
-      <input type="text" placeholder="username" id="username">
-      <input type="text" placeholder="room name" id="room_name">
-      <input type="submit" value="Join" id="join_room">
+      <input title="Username" type="text" placeholder="username" id="username">
+      <input title="Room name" type="text" placeholder="room name" id="room_name">
+      <input title="Join room" type="submit" value="Join" id="join_room">
     </form>
 
     <span id="room_info">
-      <label for="use_latency">Adjust for latency: <input type="checkbox" id="use_latency" checked></label>
-      <input type="button" value="Select video" id="select_video">
-      <input type="button" value="Share this page" id="share_page">
+      <label title="Adjusting for latency skips ahead to make sure you are synced" for="use_latency">Adjust for latency: <input type="checkbox" id="use_latency" checked></label>
+      <input title="Select the video you wish to sync" type="button" value="Select video" id="select_video">
+      <input title="Share your current tab to other people in the room" type="button" value="Share this page" id="share_page">
       <fieldset>
         <legend id="room"></legend>
         <table id="usernames"></table>
-        <input type="button" value="Leave" id="leave_room" style="margin-top: 1.5em">
+        <input title="Leave room" type="button" value="Leave" id="leave_room" style="margin-top: 1.5em">
       </fieldset>
     </span>
     <script src="browser-polyfill.min.js"></script>
