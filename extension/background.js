@@ -1,12 +1,20 @@
-var room = {},
-    ws_prom = new Promise(resolve => resolve(null));
-ws_prom.done = true;
+try {
+    importScripts("./browser-polyfill.min.js");
+} catch (e) {
+    console.log(e);
+}
+
 
 const server_version = "0.0.2";
+let room = {}
+let ws_prom = new Promise(resolve => resolve(null));
+
+ws_prom.done = true;
+
 
 function updateBadge() {
     ws_prom.then(ws => {
-        if (ws != null && ws.readyState == WebSocket.OPEN) {
+        if (ws != null && ws.readyState === WebSocket.OPEN) {
             browser.browserAction.setIcon({
                 path: {
                     16: "img/3d-glasses_active_16.png",
@@ -15,17 +23,18 @@ function updateBadge() {
                 }
             });
             if (room.port) {
-                browser.browserAction.setBadgeText({text: room.usernames.length.toString()});
-                browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"});
-                browser.browserAction.setTitle({title: "VideoSync: synced"});
+                browser.browserAction.setBadgeText({text: room.usernames.length.toString()}).then();
+                browser.browserAction.setBadgeBackgroundColor({color: "#0078c8"}).then();
+                browser.browserAction.setTitle({title: "VideoSync: synced"}).then();
             }
             else {
-                browser.browserAction.setBadgeText({text: "!"});
-                browser.browserAction.setBadgeBackgroundColor({color: "#d83131"});
-                browser.browserAction.setTitle({title: "VideoSync: select video"});
+                browser.browserAction.setBadgeText({text: "!"}).then();
+                browser.browserAction.setBadgeBackgroundColor({color: "#d83131"}).then();
+                browser.browserAction.setTitle({title: "VideoSync: select video"}).then();
             }
         }
         else {
+            browser.storage()
             browser.browserAction.setIcon({
                 path: {
                     16: "img/3d-glasses_inactive_16.png",
@@ -33,8 +42,8 @@ function updateBadge() {
                     64: "img/3d-glasses_inactive_64.png"
                 }
             });
-            browser.browserAction.setBadgeText({text: ""});
-            browser.browserAction.setTitle({title: "VideoSync"});
+            browser.browserAction.setBadgeText({text: ""}).then();
+            browser.browserAction.setTitle({title: "VideoSync"}).then();
         }
     });
 }
@@ -203,7 +212,7 @@ browser.runtime.onConnect.addListener(port => {
         }
         if (mess.videos != null) {
             port.videos = mess.videos;
-            if (port.videos == 0) {
+            if (port.videos === 0) {
                 port.disconnect();
             }
             else {
